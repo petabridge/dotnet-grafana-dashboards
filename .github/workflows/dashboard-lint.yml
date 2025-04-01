@@ -57,6 +57,8 @@ jobs:
 
       - name: Lint Kestrel Dashboard
         id: lint-kestrel
+        if: always()  # Run this step even if previous steps failed
+        continue-on-error: true 
         run: |
           echo "Running Kestrel dashboard lint..."
           # Run linter and capture both output and exit code
@@ -74,7 +76,8 @@ jobs:
 
       - name: Lint Runtime Dashboard
         id: lint-runtime
-        continue-on-error: true  # Allow this to run even if Kestrel failed
+        if: always()  # Run this step even if previous steps failed
+        continue-on-error: true 
         run: |
           echo "Running Runtime dashboard lint..."
           # Run linter and capture both output and exit code
