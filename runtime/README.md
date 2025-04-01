@@ -58,7 +58,7 @@ var app = builder.Build();
 
 ## Installation
 
-1. Import the dashboard into Grafana from Grafana Cloud:
+1. Import the dashboard into Grafana from Grafana Cloud: [https://grafana.com/grafana/dashboards/23179](https://grafana.com/grafana/dashboards/23179)
 
 2. Import the dashboard into Grafana as a JSON file:
    - Open Grafana
@@ -91,19 +91,3 @@ var app = builder.Build();
 - Thread count
 - Thread pool completion rate
 - CPU usage per thread
-
-## Troubleshooting
-
-If you're not seeing metrics:
-1. Verify that your application is exposing metrics at `/metrics` endpoint
-2. Check that Prometheus is correctly scraping your application
-3. Ensure all required OpenTelemetry packages are installed and properly configured
-4. Verify that the Runtime instrumentation is properly initialized
-5. Check that your application has sufficient permissions to collect runtime metrics
-
-## Additional Notes
-
-- The dashboard automatically adjusts time ranges and refresh rates
-- All metrics are collected with minimal performance impact
-- Metrics are available for both debug and release builds
-- The dashboard works with both self-hosted and cloud-hosted applications 
