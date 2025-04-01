@@ -42,9 +42,6 @@ jobs:
             ~/go/pkg/mod
             ~/go/bin
           key: ${{ runner.os }}-go-dashboard-linter-${{ env.LINTER_VERSION }}
-          restore-keys: |
-            ${{ runner.os }}-go-dashboard-linter-
-            ${{ runner.os }}-go-
 
       - name: Install Grafana Dashboard Linter
         if: steps.go-cache.outputs.cache-hit != 'true'

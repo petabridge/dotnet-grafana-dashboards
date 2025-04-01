@@ -47,7 +47,7 @@
     ]
   },
   "description": "Low-level performance metrics from ASP.NET Core Kestrel",
-  "editable": true,
+  "editable": false,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
   "id": null,
@@ -225,6 +225,7 @@
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
       },
+      "description": "Number of active Kestrel connections for each instance of [$job]",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -463,7 +464,7 @@
           "query": "label_values(kestrel_active_connections,job)",
           "refId": "PrometheusVariableQueryEditor-VariableQuery"
         },
-        "refresh": 1,
+        "refresh": 2,
         "regex": "",
         "skipUrlSync": false,
         "sort": 0,
@@ -488,7 +489,7 @@
           "query": "label_values(kestrel_active_connections{job=~\"$job\"},instance)",
           "refId": "PrometheusVariableQueryEditor-VariableQuery"
         },
-        "refresh": 1,
+        "refresh": 2,
         "regex": "",
         "skipUrlSync": false,
         "sort": 0,
@@ -505,6 +506,6 @@
   "timezone": "browser",
   "title": "Kestrel Metrics",
   "uid": "cehk3ukb6d5oga",
-  "version": 11,
+  "version": 14,
   "weekStart": ""
 }
