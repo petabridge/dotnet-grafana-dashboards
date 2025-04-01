@@ -42,7 +42,7 @@ var app = builder.Build();
 
 ## Installation
 
-1. Import the dashboard into Grafana from Grafana Cloud:
+1. Import the dashboard into Grafana from Grafana Cloud: [https://grafana.com/grafana/dashboards/23178](https://grafana.com/grafana/dashboards/23178)
 
 2. Import the dashboard into Grafana as a JSON file:
    - Open Grafana

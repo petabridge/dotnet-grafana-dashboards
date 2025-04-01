@@ -52,7 +52,7 @@
       }
     ]
   },
-  "description": ".NET Core Runtime Metrics",
+  "description": "Dotnet Runtime Metrics",
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
