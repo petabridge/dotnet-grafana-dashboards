@@ -1,3 +1,5 @@
 exclusions:
   panel-datasource-rule:
     reason: This is an exported public dashboard.
+  template-datasource-rule:
+    reason: This an exported public dashboard.
