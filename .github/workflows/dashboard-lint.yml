@@ -58,18 +58,45 @@ jobs:
       - name: Lint Kestrel Dashboard
         id: lint-kestrel
         run: |
-          OUTPUT=$(dashboard-linter lint kestrel/kestrel-connections-dashboard.json 2>&1) || true
+          echo "Running Kestrel dashboard lint..."
+          # Capture output but allow command to fail
+          OUTPUT=$(dashboard-linter lint kestrel/kestrel-connections-dashboard.json 2>&1) || KESTREL_EXIT_CODE=$?
+          echo "Kestrel Lint Output:"
+          echo "$OUTPUT"
           echo "KESTREL_RESULT<<EOF" >> $GITHUB_ENV
           echo "$OUTPUT" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
+          # Store exit code for final evaluation
+          echo "KESTREL_EXIT_CODE=${KESTREL_EXIT_CODE:-0}" >> $GITHUB_ENV
 
       - name: Lint Runtime Dashboard
         id: lint-runtime
         run: |
-          OUTPUT=$(dashboard-linter lint runtime/dotnet-runtime-dashboard.json 2>&1) || true
+          echo "Running Runtime dashboard lint..."
+          # Capture output but allow command to fail
+          OUTPUT=$(dashboard-linter lint runtime/dotnet-runtime-dashboard.json 2>&1) || RUNTIME_EXIT_CODE=$?
+          echo "Runtime Lint Output:"
+          echo "$OUTPUT"
           echo "RUNTIME_RESULT<<EOF" >> $GITHUB_ENV
           echo "$OUTPUT" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
+          # Store exit code for final evaluation
+          echo "RUNTIME_EXIT_CODE=${RUNTIME_EXIT_CODE:-0}" >> $GITHUB_ENV
+
+      - name: Debug Lint Results
+        if: always()  # Run this step even if previous steps failed
+        run: |
+          echo "=== Kestrel Dashboard Results ==="
+          echo "$KESTREL_RESULT"
+          echo "Exit Code: $KESTREL_EXIT_CODE"
+          echo "=== Runtime Dashboard Results ==="
+          echo "$RUNTIME_RESULT"
+          echo "Exit Code: $RUNTIME_EXIT_CODE"
+          # Fail if either dashboard had issues
+          if [ "$KESTREL_EXIT_CODE" != "0" ] || [ "$RUNTIME_EXIT_CODE" != "0" ]; then
+            echo "Linting issues found in one or more dashboards"
+            exit 1
+          fi
 
       - name: Create Issue on Lint Failure
         if: github.event_name == 'push' && failure()  # Only create issues on push events that fail
