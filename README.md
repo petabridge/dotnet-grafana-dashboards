@@ -1,5 +1,5 @@
-# dotnet-grafana-dashboards 📊
-Grafana dashboards for popular .NET OpenTelemetry metrics
+# .NET Grafana Dashboards 📊
+[Grafana dashboards](https://grafana.com/) for popular .NET OpenTelemetry metrics
 
 ## Available Dashboards 🎯
 
