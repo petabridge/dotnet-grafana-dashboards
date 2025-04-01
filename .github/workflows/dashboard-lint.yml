@@ -6,6 +6,11 @@ on:
       - '**/*.json'  # Only run when JSON files are modified
     branches:
       - master
+  push:
+    paths:
+      - '**/*.json'  # Only run when JSON files are modified
+    branches:
+      - master
 
 jobs:
   lint-dashboards:
@@ -44,6 +49,7 @@ jobs:
           echo "EOF" >> $GITHUB_ENV
 
       - name: Add Lint Results Comment
+        if: github.event_name == 'pull_request'  # Only comment on PRs
         uses: actions/github-script@v7
         with:
           script: |
@@ -63,4 +69,39 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               body: comment
+            })
+
+      - name: Create Issue on Lint Failure
+        if: github.event_name == 'push' && failure()  # Only create issues on push events that fail
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const kestrelResult = process.env.KESTREL_RESULT || 'No issues found'
+            const runtimeResult = process.env.RUNTIME_RESULT || 'No issues found'
+            
+            const title = '🚨 Grafana Dashboard Linting Issues Detected'
+            const body = `## Grafana Dashboard Lint Results 📊
+
+### Kestrel Dashboard
+\`\`\`
+${kestrelResult}
+\`\`\`
+
+### Runtime Dashboard
+\`\`\`
+${runtimeResult}
+\`\`\`
+
+This issue was automatically created because linting issues were detected after changes were merged to master.
+
+Please review and fix these issues to maintain dashboard quality standards.
+
+Linting powered by [grafana/dashboard-linter](https://github.com/grafana/dashboard-linter) 🔍`
+            
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: title,
+              body: body,
+              labels: ['dashboard', 'linting']
             }) 
