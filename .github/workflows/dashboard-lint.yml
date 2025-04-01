@@ -8,6 +8,10 @@ on:
     branches:
       - master
 
+permissions:
+  issues: write    # Required to create issues
+  pull-requests: write  # Required to comment on PRs
+
 jobs:
   lint-dashboards:
     name: Lint Grafana Dashboards
@@ -44,6 +48,8 @@ jobs:
       - name: Add Lint Results Comment
         if: github.event_name == 'pull_request'  # Only comment on PRs
         uses: actions/github-script@v7
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           script: |
             const kestrelResult = process.env.KESTREL_RESULT || 'No issues found'
@@ -65,8 +71,10 @@ jobs:
             })
 
       - name: Create Issue on Lint Failure
-        if: github.event_name == 'push' && failure()  # Only create issues on push events that fail
+        if: github.event_name == 'push'  # Only create issues on push events
         uses: actions/github-script@v7
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           script: |
             const kestrelResult = process.env.KESTREL_RESULT || 'No issues found'
