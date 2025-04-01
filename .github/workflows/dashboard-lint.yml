@@ -21,18 +21,15 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: '1.21'  # Using a recent stable version of Go
-          check-latest: true
 
       - name: Install Grafana Dashboard Linter
-        run: |
-          go install github.com/grafana/dashboard-linter@latest
-          dashboard-linter --version
+        run: go install github.com/grafana/dashboard-linter@latest
 
       - name: Lint Kestrel Dashboard
         id: lint-kestrel
         run: |
           OUTPUT=$(dashboard-linter lint kestrel/kestrel-connections-dashboard.json 2>&1) || true
-          echo "result<<EOF" >> $GITHUB_ENV
+          echo "KESTREL_RESULT<<EOF" >> $GITHUB_ENV
           echo "$OUTPUT" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
 
@@ -40,7 +37,7 @@ jobs:
         id: lint-runtime
         run: |
           OUTPUT=$(dashboard-linter lint runtime/dotnet-runtime-dashboard.json 2>&1) || true
-          echo "result<<EOF" >> $GITHUB_ENV
+          echo "RUNTIME_RESULT<<EOF" >> $GITHUB_ENV
           echo "$OUTPUT" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
 
