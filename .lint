@@ -1,3 +1,0 @@
-exclusions:
-  template-datasource-rule:
-    reason: This is an exported public dashboard.
