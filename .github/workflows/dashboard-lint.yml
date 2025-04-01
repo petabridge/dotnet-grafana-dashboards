@@ -2,13 +2,9 @@ name: Lint Grafana Dashboards
 
 on:
   pull_request:
-    paths:
-      - '**/*.json'  # Only run when JSON files are modified
     branches:
       - master
   push:
-    paths:
-      - '**/*.json'  # Only run when JSON files are modified
     branches:
       - master
 
