@@ -26,8 +26,22 @@ jobs:
         with:
           go-version: '1.21'  # Using a recent stable version of Go
 
+      - name: Cache Go modules and binaries
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+            ~/go/bin
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}-dashboard-linter
+          restore-keys: |
+            ${{ runner.os }}-go-
+
       - name: Install Grafana Dashboard Linter
-        run: go install github.com/grafana/dashboard-linter@latest
+        run: |
+          if ! command -v dashboard-linter &> /dev/null; then
+            go install github.com/grafana/dashboard-linter@latest
+          fi
 
       - name: Lint Kestrel Dashboard
         id: lint-kestrel
@@ -45,33 +59,8 @@ jobs:
           echo "$OUTPUT" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
 
-      - name: Add Lint Results Comment
-        if: github.event_name == 'pull_request'  # Only comment on PRs
-        uses: actions/github-script@v7
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          script: |
-            const kestrelResult = process.env.KESTREL_RESULT || 'No issues found'
-            const runtimeResult = process.env.RUNTIME_RESULT || 'No issues found'
-            
-            let comment = '## Grafana Dashboard Lint Results 📊\n\n'
-            comment += '### Kestrel Dashboard\n'
-            comment += '```\n' + kestrelResult + '\n```\n\n'
-            comment += '### Runtime Dashboard\n'
-            comment += '```\n' + runtimeResult + '\n```\n\n'
-            comment += '_Note: This is a new linting process and we are currently gathering feedback on the rules. Results are informational only at this time._\n\n'
-            comment += '\nLinting powered by [grafana/dashboard-linter](https://github.com/grafana/dashboard-linter) 🔍'
-            
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: comment
-            })
-
       - name: Create Issue on Lint Failure
-        if: github.event_name == 'push'  # Only create issues on push events
+        if: github.event_name == 'push' && failure()  # Only create issues on push events that fail
         uses: actions/github-script@v7
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
