@@ -8,6 +8,10 @@ on:
     branches:
       - master
 
+permissions:
+  issues: write    # Required to create issues
+  pull-requests: write  # Required to comment on PRs
+
 jobs:
   lint-dashboards:
     name: Lint Grafana Dashboards
@@ -21,55 +25,93 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: '1.21'  # Using a recent stable version of Go
-          check-latest: true
+
+      # Get the dashboard-linter version we want to use
+      - name: Get dashboard-linter version
+        id: linter-version
+        run: |
+          LINTER_VERSION="latest"  # We could make this configurable in the future
+          echo "LINTER_VERSION=$LINTER_VERSION" >> $GITHUB_ENV
+
+      - name: Cache Go modules and binaries
+        id: go-cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+            ~/go/bin
+          key: ${{ runner.os }}-go-dashboard-linter-${{ env.LINTER_VERSION }}
+          restore-keys: |
+            ${{ runner.os }}-go-dashboard-linter-
+            ${{ runner.os }}-go-
 
       - name: Install Grafana Dashboard Linter
+        if: steps.go-cache.outputs.cache-hit != 'true'
         run: |
+          export PATH=$PATH:$(go env GOPATH)/bin
           go install github.com/grafana/dashboard-linter@latest
-          dashboard-linter --version
+
+      - name: Add Go bin to PATH
+        run: echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
 
       - name: Lint Kestrel Dashboard
         id: lint-kestrel
+        if: always()  # Run this step even if previous steps failed
+        continue-on-error: true 
         run: |
-          OUTPUT=$(dashboard-linter lint kestrel/kestrel-connections-dashboard.json 2>&1) || true
-          echo "result<<EOF" >> $GITHUB_ENV
+          echo "Running Kestrel dashboard lint..."
+          # Run linter and capture both output and exit code
+          OUTPUT=$(dashboard-linter lint --strict kestrel/kestrel-connections-dashboard.json 2>&1) || KESTREL_EXIT_CODE=$?
+          echo "Kestrel Lint Output:"
+          echo "$OUTPUT"
+          echo "KESTREL_RESULT<<EOF" >> $GITHUB_ENV
           echo "$OUTPUT" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
+          # Store exit code for final evaluation
+          KESTREL_EXIT_CODE=${KESTREL_EXIT_CODE:-0}
+          echo "KESTREL_EXIT_CODE=$KESTREL_EXIT_CODE" >> $GITHUB_ENV
+          # Exit with the linter's exit code
+          exit $KESTREL_EXIT_CODE
 
       - name: Lint Runtime Dashboard
         id: lint-runtime
+        if: always()  # Run this step even if previous steps failed
+        continue-on-error: true 
         run: |
-          OUTPUT=$(dashboard-linter lint runtime/dotnet-runtime-dashboard.json 2>&1) || true
-          echo "result<<EOF" >> $GITHUB_ENV
+          echo "Running Runtime dashboard lint..."
+          # Run linter and capture both output and exit code
+          OUTPUT=$(dashboard-linter lint --strict runtime/dotnet-runtime-dashboard.json 2>&1) || RUNTIME_EXIT_CODE=$?
+          echo "Runtime Lint Output:"
+          echo "$OUTPUT"
+          echo "RUNTIME_RESULT<<EOF" >> $GITHUB_ENV
           echo "$OUTPUT" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
+          # Store exit code for final evaluation
+          RUNTIME_EXIT_CODE=${RUNTIME_EXIT_CODE:-0}
+          echo "RUNTIME_EXIT_CODE=$RUNTIME_EXIT_CODE" >> $GITHUB_ENV
+          # Exit with the linter's exit code
+          exit $RUNTIME_EXIT_CODE
 
-      - name: Add Lint Results Comment
-        if: github.event_name == 'pull_request'  # Only comment on PRs
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const kestrelResult = process.env.KESTREL_RESULT || 'No issues found'
-            const runtimeResult = process.env.RUNTIME_RESULT || 'No issues found'
-            
-            let comment = '## Grafana Dashboard Lint Results 📊\n\n'
-            comment += '### Kestrel Dashboard\n'
-            comment += '```\n' + kestrelResult + '\n```\n\n'
-            comment += '### Runtime Dashboard\n'
-            comment += '```\n' + runtimeResult + '\n```\n\n'
-            comment += '_Note: This is a new linting process and we are currently gathering feedback on the rules. Results are informational only at this time._\n\n'
-            comment += '\nLinting powered by [grafana/dashboard-linter](https://github.com/grafana/dashboard-linter) 🔍'
-            
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: comment
-            })
+      - name: Debug Lint Results
+        if: always()  # Run this step even if previous steps failed
+        run: |
+          echo "=== Lint Status Summary ==="
+          echo "Kestrel Dashboard Exit Code: $KESTREL_EXIT_CODE"
+          echo "Runtime Dashboard Exit Code: $RUNTIME_EXIT_CODE"
+          # Fail if either dashboard had issues
+          if [ "$KESTREL_EXIT_CODE" != "0" ] || [ "$RUNTIME_EXIT_CODE" != "0" ]; then
+            echo "❌ Linting issues found in one or more dashboards"
+            exit 1
+          else
+            echo "✅ All dashboards passed linting"
+          fi
 
       - name: Create Issue on Lint Failure
         if: github.event_name == 'push' && failure()  # Only create issues on push events that fail
         uses: actions/github-script@v7
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           script: |
             const kestrelResult = process.env.KESTREL_RESULT || 'No issues found'
