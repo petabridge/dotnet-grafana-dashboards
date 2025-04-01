@@ -52,8 +52,8 @@
       }
     ]
   },
-  "description": "Dotnet Runtime Metrics",
-  "editable": true,
+  "description": "Runtime metrics for .NET",
+  "editable": false,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
   "id": null,
@@ -559,6 +559,7 @@
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
       },
+      "description": "Memory fragmentation in the managed heap, per-GC generation.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -754,7 +755,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 159
+        "y": 39
       },
       "id": 5,
       "panels": [],
@@ -768,6 +769,7 @@
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
       },
+      "description": "Number of work items completed by the .NET managed ThreadPool on this [$job]",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -827,7 +829,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 160
+        "y": 40
       },
       "id": 2,
       "options": {
@@ -865,6 +867,7 @@
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
       },
+      "description": "Number of .NET ThreadPool threads and timers on [$job]",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -924,7 +927,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 160
+        "y": 40
       },
       "id": 3,
       "options": {
@@ -975,6 +978,7 @@
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
       },
+      "description": "The amount of CPU time used by instances of [$job]",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1063,7 +1067,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 168
+        "y": 48
       },
       "id": 1,
       "options": {
@@ -1137,7 +1141,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 168
+        "y": 48
       },
       "id": 6,
       "options": {
@@ -1196,7 +1200,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 261
+        "y": 141
       },
       "id": 248,
       "panels": [],
@@ -1253,8 +1257,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -1270,7 +1273,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 262
+        "y": 142
       },
       "id": 304,
       "options": {
@@ -1351,8 +1354,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -1368,7 +1370,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 262
+        "y": 142
       },
       "id": 305,
       "options": {
@@ -1449,8 +1451,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -1466,7 +1467,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 270
+        "y": 150
       },
       "id": 306,
       "options": {
@@ -1526,7 +1527,7 @@
           "query": "label_values(dotnet_assembly_count,job)",
           "refId": "PrometheusVariableQueryEditor-VariableQuery"
         },
-        "refresh": 1,
+        "refresh": 2,
         "regex": "",
         "skipUrlSync": false,
         "sort": 0,
@@ -1551,7 +1552,7 @@
           "query": "label_values(dotnet_assembly_count{job=~\"$job\"},instance)",
           "refId": "PrometheusVariableQueryEditor-VariableQuery"
         },
-        "refresh": 1,
+        "refresh": 2,
         "regex": "",
         "skipUrlSync": false,
         "sort": 0,
@@ -1566,8 +1567,8 @@
   "timeRangeUpdatedDuringEditOrView": false,
   "timepicker": {},
   "timezone": "browser",
-  "title": ".NET Core Runtime Metrics",
+  "title": "Dotnet Runtime Metrics",
   "uid": "dehk88hf0ef40a",
-  "version": 33,
+  "version": 42,
   "weekStart": ""
 }
