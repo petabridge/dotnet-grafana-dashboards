@@ -26,22 +26,34 @@ jobs:
         with:
           go-version: '1.21'  # Using a recent stable version of Go
 
+      # Get the dashboard-linter version we want to use
+      - name: Get dashboard-linter version
+        id: linter-version
+        run: |
+          LINTER_VERSION="latest"  # We could make this configurable in the future
+          echo "LINTER_VERSION=$LINTER_VERSION" >> $GITHUB_ENV
+
       - name: Cache Go modules and binaries
+        id: go-cache
         uses: actions/cache@v4
         with:
           path: |
             ~/.cache/go-build
             ~/go/pkg/mod
             ~/go/bin
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}-dashboard-linter
+          key: ${{ runner.os }}-go-dashboard-linter-${{ env.LINTER_VERSION }}
           restore-keys: |
+            ${{ runner.os }}-go-dashboard-linter-
             ${{ runner.os }}-go-
 
       - name: Install Grafana Dashboard Linter
+        if: steps.go-cache.outputs.cache-hit != 'true'
         run: |
-          if ! command -v dashboard-linter &> /dev/null; then
-            go install github.com/grafana/dashboard-linter@latest
-          fi
+          export PATH=$PATH:$(go env GOPATH)/bin
+          go install github.com/grafana/dashboard-linter@latest
+
+      - name: Add Go bin to PATH
+        run: echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
 
       - name: Lint Kestrel Dashboard
         id: lint-kestrel
