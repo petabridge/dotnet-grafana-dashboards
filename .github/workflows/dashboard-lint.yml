@@ -82,22 +82,22 @@ jobs:
             const title = '🚨 Grafana Dashboard Linting Issues Detected'
             const body = `## Grafana Dashboard Lint Results 📊
 
-### Kestrel Dashboard
-\`\`\`
-${kestrelResult}
-\`\`\`
+            ### Kestrel Dashboard
+            \`\`\`
+            ${kestrelResult}
+            \`\`\`
 
-### Runtime Dashboard
-\`\`\`
-${runtimeResult}
-\`\`\`
+            ### Runtime Dashboard
+            \`\`\`
+            ${runtimeResult}
+            \`\`\`
 
-This issue was automatically created because linting issues were detected after changes were merged to master.
+            This issue was automatically created because linting issues were detected after changes were merged to master.
 
-Please review and fix these issues to maintain dashboard quality standards.
+            Please review and fix these issues to maintain dashboard quality standards.
 
-Linting powered by [grafana/dashboard-linter](https://github.com/grafana/dashboard-linter) 🔍`
-            
+            Linting powered by [grafana/dashboard-linter](https://github.com/grafana/dashboard-linter) 🔍`
+
             await github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
