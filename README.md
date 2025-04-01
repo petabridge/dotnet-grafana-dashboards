@@ -3,15 +3,15 @@
 
 ## Available Dashboards 🎯
 
-### [Kestrel Connections Dashboard](kestrel/README.md) 🚀
-Monitor ASP.NET Core Kestrel web server performance metrics including connection durations, active connections, connection rates, and queue lengths.
-
-![Kestrel Dashboard](kestrel/screenshots/kestrel-connections-dashboard.png)
-
 ### [.NET Runtime Dashboard](runtime/README.md) ⚡
 Comprehensive monitoring of .NET runtime metrics including garbage collection, JIT compilation, thread pool performance, and exception tracking.
 
 ![Runtime Dashboard](runtime/screenshots/dotnet-threadpool-cpu-dashboard.png)
+
+### [Kestrel Connections Dashboard](kestrel/README.md) 🚀
+Monitor ASP.NET Core Kestrel web server performance metrics including connection durations, active connections, connection rates, and queue lengths.
+
+![Kestrel Dashboard](kestrel/screenshots/kestrel-connections-dashboard.png)
 
 ## Features ✨
 
