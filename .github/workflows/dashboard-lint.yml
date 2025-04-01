@@ -59,7 +59,7 @@ jobs:
         id: lint-kestrel
         run: |
           echo "Running Kestrel dashboard lint..."
-          # Capture output but allow command to fail
+          # Run linter and capture both output and exit code
           OUTPUT=$(dashboard-linter lint kestrel/kestrel-connections-dashboard.json 2>&1) || KESTREL_EXIT_CODE=$?
           echo "Kestrel Lint Output:"
           echo "$OUTPUT"
@@ -67,13 +67,17 @@ jobs:
           echo "$OUTPUT" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
           # Store exit code for final evaluation
-          echo "KESTREL_EXIT_CODE=${KESTREL_EXIT_CODE:-0}" >> $GITHUB_ENV
+          KESTREL_EXIT_CODE=${KESTREL_EXIT_CODE:-0}
+          echo "KESTREL_EXIT_CODE=$KESTREL_EXIT_CODE" >> $GITHUB_ENV
+          # Exit with the linter's exit code
+          exit $KESTREL_EXIT_CODE
 
       - name: Lint Runtime Dashboard
         id: lint-runtime
+        continue-on-error: true  # Allow this to run even if Kestrel failed
         run: |
           echo "Running Runtime dashboard lint..."
-          # Capture output but allow command to fail
+          # Run linter and capture both output and exit code
           OUTPUT=$(dashboard-linter lint runtime/dotnet-runtime-dashboard.json 2>&1) || RUNTIME_EXIT_CODE=$?
           echo "Runtime Lint Output:"
           echo "$OUTPUT"
@@ -81,21 +85,23 @@ jobs:
           echo "$OUTPUT" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
           # Store exit code for final evaluation
-          echo "RUNTIME_EXIT_CODE=${RUNTIME_EXIT_CODE:-0}" >> $GITHUB_ENV
+          RUNTIME_EXIT_CODE=${RUNTIME_EXIT_CODE:-0}
+          echo "RUNTIME_EXIT_CODE=$RUNTIME_EXIT_CODE" >> $GITHUB_ENV
+          # Exit with the linter's exit code
+          exit $RUNTIME_EXIT_CODE
 
       - name: Debug Lint Results
         if: always()  # Run this step even if previous steps failed
         run: |
-          echo "=== Kestrel Dashboard Results ==="
-          echo "$KESTREL_RESULT"
-          echo "Exit Code: $KESTREL_EXIT_CODE"
-          echo "=== Runtime Dashboard Results ==="
-          echo "$RUNTIME_RESULT"
-          echo "Exit Code: $RUNTIME_EXIT_CODE"
+          echo "=== Lint Status Summary ==="
+          echo "Kestrel Dashboard Exit Code: $KESTREL_EXIT_CODE"
+          echo "Runtime Dashboard Exit Code: $RUNTIME_EXIT_CODE"
           # Fail if either dashboard had issues
           if [ "$KESTREL_EXIT_CODE" != "0" ] || [ "$RUNTIME_EXIT_CODE" != "0" ]; then
-            echo "Linting issues found in one or more dashboards"
+            echo "❌ Linting issues found in one or more dashboards"
             exit 1
+          else
+            echo "✅ All dashboards passed linting"
           fi
 
       - name: Create Issue on Lint Failure
