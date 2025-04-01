@@ -60,7 +60,7 @@ jobs:
         run: |
           echo "Running Kestrel dashboard lint..."
           # Run linter and capture both output and exit code
-          OUTPUT=$(dashboard-linter lint kestrel/kestrel-connections-dashboard.json 2>&1) || KESTREL_EXIT_CODE=$?
+          OUTPUT=$(dashboard-linter lint --strict kestrel/kestrel-connections-dashboard.json 2>&1) || KESTREL_EXIT_CODE=$?
           echo "Kestrel Lint Output:"
           echo "$OUTPUT"
           echo "KESTREL_RESULT<<EOF" >> $GITHUB_ENV
@@ -78,7 +78,7 @@ jobs:
         run: |
           echo "Running Runtime dashboard lint..."
           # Run linter and capture both output and exit code
-          OUTPUT=$(dashboard-linter lint runtime/dotnet-runtime-dashboard.json 2>&1) || RUNTIME_EXIT_CODE=$?
+          OUTPUT=$(dashboard-linter lint --strict runtime/dotnet-runtime-dashboard.json 2>&1) || RUNTIME_EXIT_CODE=$?
           echo "Runtime Lint Output:"
           echo "$OUTPUT"
           echo "RUNTIME_RESULT<<EOF" >> $GITHUB_ENV
