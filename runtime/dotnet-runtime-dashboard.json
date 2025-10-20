@@ -350,7 +350,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "sum by (job) (irate({__name__=~\"dotnet_gc_pause_time_seconds_total|process_runtime_dotnet_gc_duration_seconds_total\", job=~\"$job\",instance=~\"$instance\"}[$__range]))",
+          "expr": "sum by (job) (irate(dotnet_gc_pause_time_seconds_total{job=~\"$job\",instance=~\"$instance\"}[$__range])) or sum by (job) (irate(process_runtime_dotnet_gc_duration_nanoseconds_total{job=~\"$job\",instance=~\"$instance\"}[$__range]) / 1e9)",
           "instant": false,
           "legendFormat": "__auto",
           "range": true,
@@ -1300,7 +1300,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "sum by(job) (irate({__name__=~\"dotnet_jit_compilation_time_seconds_total|process_runtime_dotnet_jit_compilation_time_seconds_total\", job=~\"$job\",instance=~\"$instance\"}[$__range]))",
+          "expr": "sum by(job) (irate(dotnet_jit_compilation_time_seconds_total{job=~\"$job\",instance=~\"$instance\"}[$__range])) or sum by(job) (irate(process_runtime_dotnet_jit_compilation_time_nanoseconds_total{job=~\"$job\",instance=~\"$instance\"}[$__range]) / 1e9)",
           "instant": false,
           "legendFormat": "__auto",
           "range": true,
@@ -1575,6 +1575,6 @@
   "timezone": "browser",
   "title": "Dotnet Runtime Metrics",
   "uid": "dehk88hf0ef40a",
-  "version": 47,
+  "version": 48,
   "weekStart": ""
 }
