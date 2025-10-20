@@ -52,7 +52,7 @@
       }
     ]
   },
-  "description": "Runtime metrics for .NET",
+  "description": "Runtime metrics for .NET applications using either .NET 9+ built-in metrics or OpenTelemetry.Instrumentation.Runtime package (for .NET 6/7/8). CPU metrics require .NET 9+.",
   "editable": false,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
@@ -134,7 +134,7 @@
               },
               "editorMode": "code",
               "exemplar": false,
-              "expr": "  topk(10,\r\n  sum by (error_type, job) (\r\n    ceil(increase(dotnet_exceptions_total{job=~\"$job\", instance=~\"$instance\"}[$__range]))\r\n  ))",
+              "expr": "  topk(10,\r\n  sum by (error_type, job) (\r\n    ceil(increase({__name__=~\"dotnet_exceptions_total|process_runtime_dotnet_exceptions_count_total\", job=~\"$job\", instance=~\"$instance\"}[$__range]))\r\n  ))",
               "format": "table",
               "instant": true,
               "legendFormat": "{{error_type}}",
@@ -219,7 +219,7 @@
               },
               "editorMode": "code",
               "exemplar": false,
-              "expr": "avg by (job) (dotnet_assembly_count{job=~\"$job\"})",
+              "expr": "avg by (job) ({__name__=~\"dotnet_assembly_count|process_runtime_dotnet_assemblies_count\", job=~\"$job\"})",
               "format": "table",
               "instant": true,
               "legendFormat": "__auto",
@@ -350,7 +350,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "sum by (job) (irate(dotnet_gc_pause_time_seconds_total{job=~\"$job\",instance=~\"$instance\"}[$__range]))",
+          "expr": "sum by (job) (irate(dotnet_gc_pause_time_seconds_total{job=~\"$job\",instance=~\"$instance\"}[$__range])) or sum by (job) (irate(process_runtime_dotnet_gc_duration_nanoseconds_total{job=~\"$job\",instance=~\"$instance\"}[$__range]) / 1e9)",
           "instant": false,
           "legendFormat": "__auto",
           "range": true,
@@ -448,7 +448,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "sum by (job, gc_heap_generation) (ceil(irate(dotnet_gc_collections_total{job=~\"$job\", instance=~\"$instance\"}[$__range])))",
+          "expr": "sum by (job, gc_heap_generation) (ceil(irate({__name__=~\"dotnet_gc_collections_total|process_runtime_dotnet_gc_collections_count_total\", job=~\"$job\", instance=~\"$instance\"}[$__range])))",
           "instant": false,
           "legendFormat": "{{job}} - {{gc_heap_generation}}",
           "range": true,
@@ -546,7 +546,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "sum by (job) (dotnet_gc_last_collection_memory_committed_size_bytes{job=~\"$job\",instance=~\"$instance\"})",
+          "expr": "sum by (job) ({__name__=~\"dotnet_gc_last_collection_memory_committed_size_bytes|process_runtime_dotnet_gc_committed_memory_size_bytes\", job=~\"$job\",instance=~\"$instance\"})",
           "instant": false,
           "legendFormat": "{{job}} - {{gc_heap_generation}}",
           "range": true,
@@ -644,7 +644,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "sum by (job, gc_heap_generation) (dotnet_gc_last_collection_heap_fragmentation_size_bytes{job=~\"$job\",instance=~\"$instance\"})",
+          "expr": "sum by (job, gc_heap_generation) ({__name__=~\"dotnet_gc_last_collection_heap_fragmentation_size_bytes|process_runtime_dotnet_gc_heap_fragmentation_size_bytes\", job=~\"$job\",instance=~\"$instance\"})",
           "instant": false,
           "legendFormat": "{{job}} - {{gc_heap_generation}}",
           "range": true,
@@ -742,7 +742,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "sum by (job, gc_heap_generation) (dotnet_gc_last_collection_heap_size_bytes{job=~\"$job\",instance=~\"$instance\"})",
+          "expr": "sum by (job, gc_heap_generation) ({__name__=~\"dotnet_gc_last_collection_heap_size_bytes|process_runtime_dotnet_gc_heap_size_bytes\", job=~\"$job\",instance=~\"$instance\"})",
           "instant": false,
           "legendFormat": "{{job}} - {{gc_heap_generation}}",
           "range": true,
@@ -855,7 +855,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "sum by (job) (floor(irate(dotnet_thread_pool_work_item_count_total{job=~\"$job\",instance=~\"$instance\"}[$__range])))",
+          "expr": "sum by (job) (floor(irate({__name__=~\"dotnet_thread_pool_work_item_count_total|process_runtime_dotnet_thread_pool_completed_items_count_total\", job=~\"$job\",instance=~\"$instance\"}[$__range])))",
           "instant": false,
           "legendFormat": "{{job}} completed items",
           "range": true,
@@ -953,7 +953,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "sum by(job) (dotnet_thread_pool_thread_count_total{job=~\"$job\",instance=~\"$instance\"})",
+          "expr": "sum by(job) ({__name__=~\"dotnet_thread_pool_thread_count_total|process_runtime_dotnet_thread_pool_threads_count\", job=~\"$job\",instance=~\"$instance\"})",
           "instant": false,
           "legendFormat": "{{job}} threads",
           "range": true,
@@ -965,7 +965,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "sum by(job) (dotnet_timer_count{job=~\"$job\",instance=~\"$instance\"})",
+          "expr": "sum by(job) ({__name__=~\"dotnet_timer_count|process_runtime_dotnet_timer_count\", job=~\"$job\",instance=~\"$instance\"})",
           "hide": false,
           "instant": false,
           "legendFormat": "{{job}} timers",
@@ -981,7 +981,7 @@
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
       },
-      "description": "The amount of CPU time used by instances of [$job]",
+      "description": "⚠️ Requires .NET 9+ built-in metrics (not available in OpenTelemetry.Instrumentation.Runtime package for .NET 6/7/8).\n\nThe amount of CPU time used by instances of [$job]",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1109,7 +1109,7 @@
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
       },
-      "description": "All logical CPUs available to this process - these are shared with other processes running on the same machine.",
+      "description": "⚠️ Requires .NET 9+ built-in metrics (not available in OpenTelemetry.Instrumentation.Runtime package for .NET 6/7/8).\n\nAll logical CPUs available to this process - these are shared with other processes running on the same machine.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1300,7 +1300,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "sum by(job) (irate(dotnet_jit_compilation_time_seconds_total{job=~\"$job\",instance=~\"$instance\"}[$__range]))",
+          "expr": "sum by(job) (irate(dotnet_jit_compilation_time_seconds_total{job=~\"$job\",instance=~\"$instance\"}[$__range])) or sum by(job) (irate(process_runtime_dotnet_jit_compilation_time_nanoseconds_total{job=~\"$job\",instance=~\"$instance\"}[$__range]) / 1e9)",
           "instant": false,
           "legendFormat": "__auto",
           "range": true,
@@ -1398,7 +1398,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "sum by (job) (ceil(irate(dotnet_jit_compiled_methods_total{job=~\"$job\"}[$__range])))",
+          "expr": "sum by (job) (ceil(irate({__name__=~\"dotnet_jit_compiled_methods_total|process_runtime_dotnet_jit_methods_compiled_count_total\", job=~\"$job\"}[$__range])))",
           "instant": false,
           "legendFormat": "__auto",
           "range": true,
@@ -1496,7 +1496,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "sum by (job) (dotnet_jit_compiled_il_size_bytes_total{job=~\"$job\", instance=~\"$instance\"})",
+          "expr": "sum by (job) ({__name__=~\"dotnet_jit_compiled_il_size_bytes_total|process_runtime_dotnet_jit_il_compiled_size_bytes_total\", job=~\"$job\", instance=~\"$instance\"})",
           "instant": false,
           "legendFormat": "__auto",
           "range": true,
@@ -1521,7 +1521,7 @@
           "type": "prometheus",
           "uid": "${DS_PROMETHEUS}"
         },
-        "definition": "label_values(dotnet_assembly_count,job)",
+        "definition": "label_values({__name__=~\"dotnet_assembly_count|process_runtime_dotnet_assemblies_count\"},job)",
         "hide": 0,
         "includeAll": true,
         "label": "Job",
@@ -1530,7 +1530,7 @@
         "options": [],
         "query": {
           "qryType": 1,
-          "query": "label_values(dotnet_assembly_count,job)",
+          "query": "label_values({__name__=~\"dotnet_assembly_count|process_runtime_dotnet_assemblies_count\"},job)",
           "refId": "PrometheusVariableQueryEditor-VariableQuery"
         },
         "refresh": 2,
@@ -1546,7 +1546,7 @@
           "type": "prometheus",
           "uid": "${DS_PROMETHEUS}"
         },
-        "definition": "label_values(dotnet_assembly_count{job=~\"$job\"},instance)",
+        "definition": "label_values({__name__=~\"dotnet_assembly_count|process_runtime_dotnet_assemblies_count\",job=~\"$job\"},instance)",
         "hide": 0,
         "includeAll": true,
         "label": "Instance",
@@ -1555,7 +1555,7 @@
         "options": [],
         "query": {
           "qryType": 1,
-          "query": "label_values(dotnet_assembly_count{job=~\"$job\"},instance)",
+          "query": "label_values({__name__=~\"dotnet_assembly_count|process_runtime_dotnet_assemblies_count\",job=~\"$job\"},instance)",
           "refId": "PrometheusVariableQueryEditor-VariableQuery"
         },
         "refresh": 2,
@@ -1575,6 +1575,6 @@
   "timezone": "browser",
   "title": "Dotnet Runtime Metrics",
   "uid": "dehk88hf0ef40a",
-  "version": 46,
+  "version": 48,
   "weekStart": ""
 }
