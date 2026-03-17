@@ -13,6 +13,17 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
+      - name: "Extract latest release notes"
+        shell: pwsh
+        run: |
+          $content = Get-Content RELEASE_NOTES.md -Raw
+          # Match from the first #### heading to just before the second one
+          if ($content -match '(?s)(####.+?)(?=\n####|\z)') {
+            $Matches[1].Trim() | Set-Content RELEASE_NOTES_LATEST.md
+          } else {
+            $content | Set-Content RELEASE_NOTES_LATEST.md
+          }
+
       - name: release
         uses: actions/create-release@v1
         id: create_release
@@ -21,7 +32,7 @@ jobs:
         with:
           tag_name: ${{ github.ref }}
           release_name: ${{ github.ref_name }}
-          body_path: RELEASE_NOTES.md
+          body_path: RELEASE_NOTES_LATEST.md
           draft: false
           prerelease: false
 
