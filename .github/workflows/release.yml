@@ -37,7 +37,7 @@ jobs:
           prerelease: false
 
       - name: Upload Release Assets
-        uses: AButler/upload-release-assets@v3.0
+        uses: AButler/upload-release-assets@v4.0
         with:
           repo-token: ${{ github.token }}
           release-tag: ${{ github.ref_name }}
